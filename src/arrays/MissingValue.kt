@@ -1,5 +1,6 @@
 package arrays
 
+/* The solution to LeetCode question: https://leetcode.com/problems/missing-number/ */
 interface MissingValue {
     fun missingNumber(nums: IntArray): Int
 
