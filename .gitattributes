@@ -1,0 +1,8 @@
+# Set default behavior to automatic normalization
+* text=auto
+
+# Force LF for Kotlin and Gradle source files
+*.kt text eol=lf
+*.kts text eol=lf
+*.gradle text eol=lf
+*.properties text eol=lf
