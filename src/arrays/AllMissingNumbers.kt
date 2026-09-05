@@ -3,7 +3,7 @@ package arrays
 import kotlin.math.abs
 
 /**
- * This is a solution to the LeetCode question https://leetcode.com/problems/all-missing-numbers/
+ * This is a solution to the LeetCode question https://leetcode.com/problems/find-all-numbers-disappeared-in-an-array/
  * */
 interface AllMissingNumbers {
     fun allMissingNumbers(nums: IntArray): List<Int>
