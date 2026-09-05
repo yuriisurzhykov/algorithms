@@ -1,5 +1,7 @@
 package arrays
 
+import kotlin.math.abs
+
 /**
  * This is a solution to the LeetCode question https://leetcode.com/problems/all-missing-numbers/
  * */
@@ -17,11 +19,24 @@ interface AllMissingNumbers {
         }
     }
 
+    class MemoryEfficient : AllMissingNumbers {
+        override fun allMissingNumbers(nums: IntArray): List<Int> {
+            for (i in nums.indices) {
+                val index = abs(nums[i]) - 1
+                if (nums[index] > 0) nums[index] = -nums[index]
+            }
+
+            return nums.indices.mapNotNull {
+                if (nums[it] > 0) it + 1 else null
+            }
+        }
+    }
+
     companion object {
         @JvmStatic
         fun main(args: Array<String>) {
-            val nums = intArrayOf(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
-            val solution = BruteForce()
+            val nums = intArrayOf(1, 2, 3, 3, 5, 9, 7, 8, 9, 9)
+            val solution = MemoryEfficient()
             println(solution.allMissingNumbers(nums))
         }
     }
