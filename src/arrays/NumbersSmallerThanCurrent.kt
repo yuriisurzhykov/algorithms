@@ -22,16 +22,15 @@ interface NumbersSmallerThanCurrent {
     class Sorted : NumbersSmallerThanCurrent {
         override fun smallerNumbersThanCurrent(nums: IntArray): IntArray {
             // Sort items before
-            nums.sort()
+            val sorted = nums.sorted()
+            val indicesDict = mutableMapOf<Int, Int>()
+            sorted.forEachIndexed { index, num ->
+                if (indicesDict.containsKey(num)) return@forEachIndexed
+                indicesDict[num] = index
+            }
             val returns = IntArray(nums.size) { 0 }
-            var lastSmallIndex = 0
-            for (i in 0..<nums.lastIndex) {
-                if (nums[i] < nums[i + 1]) {
-                    lastSmallIndex = i
-                    continue
-                } else if (nums[i] == nums[i + 1]) {
-                    returns[i] = lastSmallIndex + 1
-                }
+            nums.forEachIndexed { index, num ->
+                returns[index] = indicesDict[num] ?: 0
             }
             return returns
         }
