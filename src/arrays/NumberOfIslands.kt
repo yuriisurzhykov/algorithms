@@ -40,27 +40,31 @@ package arrays
  * - 1 <= m, n <= 300
  * - grid[i][j] is '0' or '1'.
  * */
+
+
+enum class Direction(val adjustRow: Int, val adjustCol: Int) {
+    RIGHT(0, 1),
+    LEFT(0, -1),
+    TOP(-1, 0),
+    BOTTOM(1, 0);
+}
+
+class Point(val row: Int, val col: Int) {
+    fun move(direction: Direction) = Point(
+        row = row + direction.adjustRow,
+        col = col + direction.adjustCol
+    )
+}
+
 interface NumberOfIslands {
 
     fun numIslands(grid: Array<CharArray>): Int
 
-    class Solution : NumberOfIslands {
+    abstract class Abstract : NumberOfIslands {
 
-        internal enum class Direction(val adjustRow: Int, val adjustCol: Int) {
-            RIGHT(0, 1),
-            LEFT(0, -1),
-            TOP(-1, 0),
-            BOTTOM(1, 0);
-        }
+        protected abstract fun islandExists(grid: Array<CharArray>, visited: Array<BooleanArray>, point: Point): Boolean
 
-        internal class Point(val row: Int, val col: Int) {
-            fun move(direction: Direction) = Point(
-                row = row + direction.adjustRow,
-                col = col + direction.adjustCol
-            )
-        }
-
-        override fun numIslands(grid: Array<CharArray>): Int {
+        final override fun numIslands(grid: Array<CharArray>): Int {
             checkGridSize(grid)
 
             val visitedCells = Array(grid.size) { index -> BooleanArray(grid[index].size) }
@@ -75,7 +79,7 @@ interface NumberOfIslands {
             return islandsCount
         }
 
-        private fun checkGridSize(grid: Array<CharArray>) {
+        protected fun checkGridSize(grid: Array<CharArray>) {
             check(grid.isNotEmpty()) {
                 "The grid must contain at least on row"
             }
@@ -84,7 +88,29 @@ interface NumberOfIslands {
             }
         }
 
-        private fun islandExists(
+        protected fun isValidPoint(
+            grid: Array<CharArray>,
+            visited: Array<BooleanArray>,
+            point: Point
+        ): Boolean {
+            val col = point.col
+            val row = point.row
+
+            return row >= 0 && row < grid.size &&
+                    col >= 0 && col < grid[row].size &&
+                    grid[row][col] == ISLAND_CODE &&
+                    !visited[row][col]
+
+        }
+
+        private companion object {
+            const val ISLAND_CODE = '1'
+        }
+    }
+
+    class BfsSolution : Abstract() {
+
+        override fun islandExists(
             grid: Array<CharArray>,
             visited: Array<BooleanArray>,
             point: Point
@@ -111,31 +137,40 @@ interface NumberOfIslands {
             }
             return true
         }
+    }
 
-        private fun isValidPoint(
+    class DfsSolution : Abstract() {
+        override fun islandExists(
             grid: Array<CharArray>,
             visited: Array<BooleanArray>,
             point: Point
         ): Boolean {
-            val col = point.col
-            val row = point.row
+            if (!isValidPoint(grid, visited, point)) return false
 
-            return row >= 0 && row < grid.size &&
-                    col >= 0 && col < grid[row].size &&
-                    grid[row][col] == ISLAND_CODE &&
-                    !visited[row][col]
+            val stack = ArrayDeque<Point>()
+            stack.addLast(point)
+            visited[point.row][point.col] = true
 
-        }
-
-        private companion object {
-            const val ISLAND_CODE = '1'
+            loop@ while (stack.isNotEmpty()) {
+                val cell = stack.last()
+                Direction.entries.forEach { direction ->
+                    val neighbor = cell.move(direction)
+                    if (isValidPoint(grid, visited, neighbor)) {
+                        visited[neighbor.row][neighbor.col] = true
+                        stack.addLast(neighbor)
+                        continue@loop
+                    }
+                }
+                stack.removeLast()
+            }
+            return true
         }
     }
 
     companion object {
         @JvmStatic
         fun main(args: Array<String>) {
-            val solution: NumberOfIslands = Solution()
+            val solution: NumberOfIslands = DfsSolution()
             val example1 = arrayOf(
                 charArrayOf('1', '1', '1', '1', '0'),
                 charArrayOf('1', '1', '0', '1', '0'),
