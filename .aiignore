@@ -1,2 +1,3 @@
 src/arrays/*.kt
 src/strings/*.kt
+src/tree/*.kt
